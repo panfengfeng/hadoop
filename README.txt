@@ -1,3 +1,7 @@
+Created by panfengfeng at Sep.28 2016
+
+add storagetype info
+
 For the latest information about Hadoop, please visit our website at:
 
    http://hadoop.apache.org/core/
