@@ -39,6 +39,7 @@ import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.UnresolvedLinkException;
+import org.apache.hadoop.hdfs.StorageType;
 import org.apache.hadoop.hdfs.BlockReader;
 import org.apache.hadoop.hdfs.BlockReaderFactory;
 import org.apache.hadoop.hdfs.DFSClient;
@@ -384,6 +385,7 @@ public class NamenodeFsck implements DataEncryptionKeyFactory {
       boolean isCorrupt = lBlk.isCorrupt();
       String blkName = block.toString();
       DatanodeInfo[] locs = lBlk.getLocations();
+      StorageType[] storageTypes = lBlk.getStorageTypes();
       NumberReplicas numberReplicas = namenode.getNamesystem().getBlockManager().countNodes(block.getLocalBlock());
       int liveReplicas = numberReplicas.liveReplicas();
       res.totalReplicas += liveReplicas;
@@ -444,6 +446,7 @@ public class NamenodeFsck implements DataEncryptionKeyFactory {
               sb.append(NodeBase.getPath(locs[j]));
             else
               sb.append(locs[j]);
+            sb.append(" " + storageTypes[j]);
           }
           sb.append(']');
           report.append(" " + sb.toString());

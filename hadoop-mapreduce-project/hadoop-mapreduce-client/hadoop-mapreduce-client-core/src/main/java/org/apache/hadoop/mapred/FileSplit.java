@@ -76,10 +76,16 @@ public class FileSplit extends org.apache.hadoop.mapreduce.InputSplit
    fs = new org.apache.hadoop.mapreduce.lib.input.FileSplit(file, start,
           length, hosts, inMemoryHosts);
  }
-  
+
   public FileSplit(org.apache.hadoop.mapreduce.lib.input.FileSplit fs) {
     this.fs = fs;
   }
+
+    public FileSplit(Path file, long start, long length, String[] hosts,
+                     String[] inMemoryHosts, String[] storagetypes) {
+        fs = new org.apache.hadoop.mapreduce.lib.input.FileSplit(file, start,
+                length, hosts, inMemoryHosts, storagetypes);
+    }
 
   /** The file containing this split's data. */
   public Path getPath() { return fs.getPath(); }

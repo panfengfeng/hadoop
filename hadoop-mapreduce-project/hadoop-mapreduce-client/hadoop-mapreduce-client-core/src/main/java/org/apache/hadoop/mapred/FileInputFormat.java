@@ -305,6 +305,11 @@ public abstract class FileInputFormat<K, V> implements InputFormat<K, V> {
     return new FileSplit(file, start, length, hosts, inMemoryHosts);
   }
 
+    protected FileSplit makeSplit(Path file, long start, long length,
+                                  String[] hosts, String[] inMemoryHosts, String[] storagetypes) {
+       return new FileSplit(file, start, length, hosts, inMemoryHosts, storagetypes);
+    }
+
   /** Splits files returned by {@link #listStatus(JobConf)} when
    * they're too big.*/ 
   public InputSplit[] getSplits(JobConf job, int numSplits)
@@ -341,27 +346,49 @@ public abstract class FileInputFormat<K, V> implements InputFormat<K, V> {
           blkLocations = fs.getFileBlockLocations(file, 0, length);
         }
         if (isSplitable(fs, path)) {
+
+            for (BlockLocation blocklocation: blkLocations) {
+                LOG.debug("mapred_getSplits hosts ");
+                String[] hosts = blocklocation.getHosts();
+                for (String host: hosts)
+                    LOG.debug(host);
+                LOG.debug("mapred_getSplits storagetypes ");
+                String[] storagetypes = blocklocation.getStorageTypes();
+                for (String storagetype: storagetypes)
+                    LOG.debug(storagetype);
+            }
+
           long blockSize = file.getBlockSize();
           long splitSize = computeSplitSize(goalSize, minSize, blockSize);
+            LOG.debug("mapred_getSplits blockSize " + blockSize + " splitSize " + splitSize);
 
           long bytesRemaining = length;
           while (((double) bytesRemaining)/splitSize > SPLIT_SLOP) {
             String[][] splitHosts = getSplitHostsAndCachedHosts(blkLocations,
                 length-bytesRemaining, splitSize, clusterMap);
+              splits.add(makeSplit(path, length-bytesRemaining, splitSize,
+                      splitHosts[0], splitHosts[1], splitHosts[2]));
+            /*
             splits.add(makeSplit(path, length-bytesRemaining, splitSize,
                 splitHosts[0], splitHosts[1]));
+            */
             bytesRemaining -= splitSize;
           }
 
           if (bytesRemaining != 0) {
             String[][] splitHosts = getSplitHostsAndCachedHosts(blkLocations, length
                 - bytesRemaining, bytesRemaining, clusterMap);
+              splits.add(makeSplit(path, length - bytesRemaining, bytesRemaining,
+                      splitHosts[0], splitHosts[1], splitHosts[2]));
+            /*
             splits.add(makeSplit(path, length - bytesRemaining, bytesRemaining,
                 splitHosts[0], splitHosts[1]));
+            */
           }
         } else {
           String[][] splitHosts = getSplitHostsAndCachedHosts(blkLocations,0,length,clusterMap);
-          splits.add(makeSplit(path, 0, length, splitHosts[0], splitHosts[1]));
+            splits.add(makeSplit(path, 0, length, splitHosts[0], splitHosts[1], splitHosts[2]));
+          // splits.add(makeSplit(path, 0, length, splitHosts[0], splitHosts[1]));
         }
       } else { 
         //Create empty hosts array for zero length files
@@ -581,8 +608,13 @@ public abstract class FileInputFormat<K, V> implements InputFormat<K, V> {
 
     //If this is the only block, just return
     if (bytesInThisBlock >= splitSize) {
+        return new String[][] { blkLocations[startIndex].getHosts(),
+                blkLocations[startIndex].getCachedHosts(),
+                blkLocations[startIndex].getStorageTypes() };
+      /*
       return new String[][] { blkLocations[startIndex].getHosts(),
           blkLocations[startIndex].getCachedHosts() };
+      */
     }
 
     long bytesInFirstBlock = bytesInThisBlock;

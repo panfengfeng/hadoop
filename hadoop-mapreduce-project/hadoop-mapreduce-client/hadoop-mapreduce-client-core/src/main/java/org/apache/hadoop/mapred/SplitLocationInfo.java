@@ -26,12 +26,21 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
 public class SplitLocationInfo {
   private boolean inMemory;
   private String location;
+
+  private String storagetype;
   
   public SplitLocationInfo(String location, boolean inMemory) {
     this.location = location;
     this.inMemory = inMemory;
   }
-  
+
+  public void setStorageType(String storagetype) {
+      this.storagetype = storagetype;
+  }
+  public String getStorageType() {
+      return storagetype;
+  }
+
   public boolean isOnDisk() {
     return true;
   }

@@ -505,10 +505,14 @@ public class DFSUtil {
       assert idx < nrBlocks : "Incorrect index";
       DatanodeInfo[] locations = blk.getLocations();
       String[] hosts = new String[locations.length];
+      StorageType[] types = blk.getStorageTypes();
+      String[] storagetypes = new String[types.length];
       String[] xferAddrs = new String[locations.length];
       String[] racks = new String[locations.length];
       for (int hCnt = 0; hCnt < locations.length; hCnt++) {
         hosts[hCnt] = locations[hCnt].getHostName();
+        storagetypes[hCnt] = types[hCnt].toString();
+        LOG.info("locatedBlocks2Locations host " + hosts[hCnt] + " storagetype " + storagetypes[hCnt]);
         xferAddrs[hCnt] = locations[hCnt].getXferAddr();
         NodeBase node = new NodeBase(xferAddrs[hCnt], 
                                      locations[hCnt].getNetworkLocation());
@@ -524,6 +528,7 @@ public class DFSUtil {
                                             blk.getStartOffset(),
                                             blk.getBlockSize(),
                                             blk.isCorrupt());
+      blkLocations[idx].setStorageTypes(storagetypes);
       idx++;
     }
     return blkLocations;

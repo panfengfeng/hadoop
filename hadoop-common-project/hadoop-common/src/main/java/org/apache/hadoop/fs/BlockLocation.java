@@ -40,6 +40,8 @@ public class BlockLocation {
 
   private static final String[] EMPTY_STR_ARRAY = new String[0];
 
+  private String[] storagetypes = EMPTY_STR_ARRAY;
+
   /**
    * Default Constructor
    */
@@ -58,6 +60,7 @@ public class BlockLocation {
     this.offset = that.offset;
     this.length = that.length;
     this.corrupt = that.corrupt;
+    this.storagetypes = that.storagetypes;
   }
 
   /**
@@ -126,6 +129,14 @@ public class BlockLocation {
   public String[] getHosts() throws IOException {
     return hosts;
   }
+
+
+    /**
+     * Get the list of storage types of the block
+     */
+    public String[] getStorageTypes() throws IOException {
+        return storagetypes;
+    }
 
   /**
    * Get the list of hosts (hostname) hosting a cached replica of the block
@@ -201,6 +212,17 @@ public class BlockLocation {
       this.hosts = hosts;
     }
   }
+
+    /**
+     *  Set the storage types hosting this block
+     */
+    public void setStorageTypes(String[] storagetypes) {
+        if (storagetypes == null) {
+            this.storagetypes = EMPTY_STR_ARRAY;
+        } else {
+            this.storagetypes = storagetypes;
+        }
+    }
 
   /**
    * Set the hosts hosting a cached replica of this block

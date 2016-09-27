@@ -85,10 +85,28 @@ public class FileSplit extends InputSplit implements Writable {
      hostInfos[i] = new SplitLocationInfo(hosts[i], inMemory);
    }
  }
- 
-  /** The file containing this split's data. */
+
+    public FileSplit(Path file, long start, long length, String[] hosts,
+                     String[] inMemoryHosts, String[] storagetypes) {
+        this(file, start, length, hosts);
+        hostInfos = new SplitLocationInfo[hosts.length];
+        for (int i = 0; i < hosts.length; i++) {
+            // because N will be tiny, scanning is probably faster than a HashSet
+            boolean inMemory = false;
+            for (String inMemoryHost : inMemoryHosts) {
+                if (inMemoryHost.equals(hosts[i])) {
+                    inMemory = true;
+                    break;
+                }
+            }
+            hostInfos[i] = new SplitLocationInfo(hosts[i], inMemory);
+            hostInfos[i].setStorageType(storagetypes[i]);
+        }
+    }
+
+    /** The file containing this split's data. */
   public Path getPath() { return file; }
-  
+
   /** The position of the first byte in the file to process. */
   public long getStart() { return start; }
   

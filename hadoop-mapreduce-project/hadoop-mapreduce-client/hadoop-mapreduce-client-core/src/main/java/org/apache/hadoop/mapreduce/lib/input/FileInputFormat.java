@@ -370,6 +370,11 @@ public abstract class FileInputFormat<K, V> extends InputFormat<K, V> {
     return new FileSplit(file, start, length, hosts, inMemoryHosts);
   }
 
+  protected FileSplit makeSplit(Path file, long start, long length,
+                                String[] hosts, String[] inMemoryHosts, String[] storagetypes) {
+    return new FileSplit(file, start, length, hosts, inMemoryHosts, storagetypes);
+  }
+
   /** 
    * Generate the list of files and make them into FileSplits.
    * @param job the job context
@@ -395,27 +400,57 @@ public abstract class FileInputFormat<K, V> extends InputFormat<K, V> {
           blkLocations = fs.getFileBlockLocations(file, 0, length);
         }
         if (isSplitable(job, path)) {
+
+          for (BlockLocation blocklocation: blkLocations) {
+              LOG.debug("mapreduce_getSplits hosts ");
+              String[] hosts = blocklocation.getHosts();
+              for (String host: hosts)
+                  LOG.debug(host);
+              LOG.debug("mapreduce_getSplits storagetypes ");
+              String[] storagetypes = blocklocation.getStorageTypes();
+              for (String storagetype: storagetypes)
+                  LOG.debug(storagetype);
+          }
+
           long blockSize = file.getBlockSize();
           long splitSize = computeSplitSize(blockSize, minSize, maxSize);
+          LOG.debug("mapreduce_getSplits blockSize " + blockSize + " splitSize " + splitSize);
 
           long bytesRemaining = length;
           while (((double) bytesRemaining)/splitSize > SPLIT_SLOP) {
             int blkIndex = getBlockIndex(blkLocations, length-bytesRemaining);
             splits.add(makeSplit(path, length-bytesRemaining, splitSize,
+                    blkLocations[blkIndex].getHosts(),
+                    blkLocations[blkIndex].getCachedHosts(),
+                    blkLocations[blkIndex].getStorageTypes()));
+            /*
+            splits.add(makeSplit(path, length-bytesRemaining, splitSize,
                         blkLocations[blkIndex].getHosts(),
                         blkLocations[blkIndex].getCachedHosts()));
+            */
             bytesRemaining -= splitSize;
           }
 
           if (bytesRemaining != 0) {
             int blkIndex = getBlockIndex(blkLocations, length-bytesRemaining);
+            splits.add(makeSplit(path, length-bytesRemaining, splitSize,
+                    blkLocations[blkIndex].getHosts(),
+                    blkLocations[blkIndex].getCachedHosts(),
+                    blkLocations[blkIndex].getStorageTypes()));
+            /*
             splits.add(makeSplit(path, length-bytesRemaining, bytesRemaining,
                        blkLocations[blkIndex].getHosts(),
                        blkLocations[blkIndex].getCachedHosts()));
+            */
           }
         } else { // not splitable
           splits.add(makeSplit(path, 0, length, blkLocations[0].getHosts(),
+                    blkLocations[0].getCachedHosts(),
+                    blkLocations[0].getStorageTypes()));
+          /*
+          splits.add(makeSplit(path, 0, length, blkLocations[0].getHosts(),
                       blkLocations[0].getCachedHosts()));
+          */
         }
       } else { 
         //Create empty hosts array for zero length files
