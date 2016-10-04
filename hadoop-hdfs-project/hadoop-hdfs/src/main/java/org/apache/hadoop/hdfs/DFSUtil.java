@@ -513,7 +513,7 @@ public class DFSUtil {
       for (int hCnt = 0; hCnt < locations.length; hCnt++) {
         hosts[hCnt] = locations[hCnt].getHostName();
         storagetypes[hCnt] = types[hCnt].toString();
-        LOG.info("block " + blockname + " host " + hosts[hCnt] + " storagetype " + storagetypes[hCnt]);
+        LOG.info("idx " + idx + " block " + blockname + " host " + hosts[hCnt] + " storagetype " + storagetypes[hCnt]);
         xferAddrs[hCnt] = locations[hCnt].getXferAddr();
         NodeBase node = new NodeBase(xferAddrs[hCnt], 
                                      locations[hCnt].getNetworkLocation());
