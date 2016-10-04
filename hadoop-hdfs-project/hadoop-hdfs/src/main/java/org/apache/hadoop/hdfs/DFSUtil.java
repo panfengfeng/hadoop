@@ -504,6 +504,7 @@ public class DFSUtil {
     for (LocatedBlock blk : blocks) {
       assert idx < nrBlocks : "Incorrect index";
       DatanodeInfo[] locations = blk.getLocations();
+      String blockname = blk.getBlock().getBlockName();
       String[] hosts = new String[locations.length];
       StorageType[] types = blk.getStorageTypes();
       String[] storagetypes = new String[types.length];
@@ -512,7 +513,7 @@ public class DFSUtil {
       for (int hCnt = 0; hCnt < locations.length; hCnt++) {
         hosts[hCnt] = locations[hCnt].getHostName();
         storagetypes[hCnt] = types[hCnt].toString();
-        LOG.info("locatedBlocks2Locations host " + hosts[hCnt] + " storagetype " + storagetypes[hCnt]);
+        LOG.info("block " + blockname + " host " + hosts[hCnt] + " storagetype " + storagetypes[hCnt]);
         xferAddrs[hCnt] = locations[hCnt].getXferAddr();
         NodeBase node = new NodeBase(xferAddrs[hCnt], 
                                      locations[hCnt].getNetworkLocation());
