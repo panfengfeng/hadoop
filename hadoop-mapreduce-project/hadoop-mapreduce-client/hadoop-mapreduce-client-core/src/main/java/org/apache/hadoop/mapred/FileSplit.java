@@ -87,7 +87,16 @@ public class FileSplit extends org.apache.hadoop.mapreduce.InputSplit
                 length, hosts, inMemoryHosts, storagetypes);
     }
 
-  /** The file containing this split's data. */
+    public void setPreferloc(String loc) {
+        fs.setPreferloc(loc);
+    }
+
+    public String getPreferloc() {
+        return fs.getPreferloc();
+    }
+
+
+    /** The file containing this split's data. */
   public Path getPath() { return fs.getPath(); }
   
   /** The position of the first byte in the file to process. */
