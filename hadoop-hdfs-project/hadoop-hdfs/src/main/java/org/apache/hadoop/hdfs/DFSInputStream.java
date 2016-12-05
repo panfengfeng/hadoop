@@ -569,7 +569,7 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
       chosenNode = retval.info;
       InetSocketAddress targetAddr = retval.addr;
       StorageType storageType = retval.storageType;
-
+      DFSClient.LOG.info("DatanodeInfo blockSeekTo chosenNode " + chosenNode + " storageType " + storageType);
       try {
         ExtendedBlock blk = targetBlock.getBlock();
         Token<BlockTokenIdentifier> accessToken = targetBlock.getBlockToken();
@@ -853,7 +853,6 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
 
     return readWithStrategy(byteBufferReader, 0, buf.remaining());
   }
-
 
   /**
    * Add corrupted block replica into map.

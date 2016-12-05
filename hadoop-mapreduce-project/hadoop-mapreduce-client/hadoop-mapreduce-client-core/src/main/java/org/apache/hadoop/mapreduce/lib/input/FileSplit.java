@@ -44,6 +44,7 @@ public class FileSplit extends InputSplit implements Writable {
   private long length;
   private String[] hosts;
   private SplitLocationInfo[] hostInfos;
+  private String preferloc;
 
   public FileSplit() {}
 
@@ -104,6 +105,13 @@ public class FileSplit extends InputSplit implements Writable {
         }
     }
 
+  public void setPreferloc(String loc) {
+      preferloc = loc;
+  }
+
+  public String getPreferloc() {
+      return preferloc;
+  }
     /** The file containing this split's data. */
   public Path getPath() { return file; }
 
