@@ -95,7 +95,6 @@ public class FileSplit extends org.apache.hadoop.mapreduce.InputSplit
         return fs.getPreferloc();
     }
 
-
     /** The file containing this split's data. */
   public Path getPath() { return fs.getPath(); }
   
