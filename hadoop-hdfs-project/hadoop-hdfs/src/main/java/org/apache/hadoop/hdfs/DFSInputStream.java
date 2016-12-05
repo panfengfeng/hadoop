@@ -934,15 +934,31 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
     StorageType[] storageTypes = block.getStorageTypes();
     DatanodeInfo chosenNode = null;
     StorageType storageType = null;
+    int once = 0;
+    int first = 0;
     if (nodes != null) {
       for (int i = 0; i < nodes.length; i++) {
         if (!deadNodes.containsKey(nodes[i])
             && (ignoredNodes == null || !ignoredNodes.contains(nodes[i]))) {
+          if (once == 0) {
+              first = i;
+              once = 1;
+          }
           chosenNode = nodes[i];
           // Storage types are ordered to correspond with nodes, so use the same
           // index to get storage type.
           if (storageTypes != null && i < storageTypes.length) {
             storageType = storageTypes[i];
+            if (storageType == StorageType.SSD)
+                break;
+            else {
+                if (i == nodes.length - 1) {
+                    chosenNode = nodes[first];
+                    storageType = storageTypes[first];
+                    break;
+                }
+                continue;
+            }
           }
           break;
         }
