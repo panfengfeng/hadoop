@@ -295,13 +295,26 @@ public class DistributedFileSystem extends FileSystem {
       throws IOException {
     statistics.incrementReadOps(1);
     Path absF = fixRelativePart(f);
+    if (absF.getPreferedloc() == null || absF.getPreferedloc().isEmpty()) {
+        if (f.getPreferedloc() == null || f.getPreferedloc().isEmpty()) {
+            // nothing to do
+        } else {
+            absF.setPreferedloc(f.getPreferedloc());
+        }
+    }
     return new FileSystemLinkResolver<FSDataInputStream>() {
       @Override
       public FSDataInputStream doCall(final Path p)
           throws IOException, UnresolvedLinkException {
-        final DFSInputStream dfsis =
-          dfs.open(getPathName(p), bufferSize, verifyChecksum);
-        return dfs.createWrappedInputStream(dfsis);
+        if (p.getPreferedloc() == null || p.getPreferedloc().isEmpty()) {
+            final DFSInputStream dfsis =
+                    dfs.open(getPathName(p) + ":", bufferSize, verifyChecksum);
+            return dfs.createWrappedInputStream(dfsis);
+        } else {
+            final DFSInputStream dfsis =
+                    dfs.open(getPathName(p) + ":" + p.getPreferedloc(), bufferSize, verifyChecksum);
+            return dfs.createWrappedInputStream(dfsis);
+        }
       }
       @Override
       public FSDataInputStream next(final FileSystem fs, final Path p)

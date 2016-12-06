@@ -96,6 +96,7 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
   private long lastBlockBeingWrittenLength = 0;
   private FileEncryptionInfo fileEncryptionInfo = null;
   private DatanodeInfo currentNode = null;
+  private String preferedloc;
   private LocatedBlock currentLocatedBlock = null;
   private long pos = 0;
   private long blockEnd = -1;
@@ -225,9 +226,15 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
     this.dfsClient = dfsClient;
     this.verifyChecksum = verifyChecksum;
     this.buffersize = buffersize;
-    this.src = src;
+    int index = src.lastIndexOf(":");
+    int end = src.length();
+    this.src = src.substring(0, index);
+    if (index + 1 != end) {
+        this.preferedloc = src.substring(index + 1, end);
+    }
     this.cachingStrategy =
         dfsClient.getDefaultReadCachingStrategy();
+    DFSClient.LOG.info("DFSInputStream " + this.src + " preferedloc " + this.preferedloc);
     openInfo();
   }
 
@@ -939,6 +946,12 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
         if (!deadNodes.containsKey(nodes[i])
             && (ignoredNodes == null || !ignoredNodes.contains(nodes[i]))) {
           chosenNode = nodes[i];
+          if (preferedloc == null || preferedloc.isEmpty()) {
+              // nothing to do
+          } else {
+              if (!(chosenNode.getHostName().equals(preferedloc)))
+                 continue;
+          }
           // Storage types are ordered to correspond with nodes, so use the same
           // index to get storage type.
           if (storageTypes != null && i < storageTypes.length) {

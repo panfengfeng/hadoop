@@ -58,6 +58,17 @@ public class Path implements Comparable {
 
   private URI uri;                                // a hierarchical uri
 
+
+  private String preferedloc;
+
+  public String getPreferedloc() {
+      return preferedloc;
+  }
+
+  public void setPreferedloc(String loc) {
+      preferedloc = loc;
+  }
+
   /**
    * Pathnames with scheme and relative path are illegal.
    * @param path to be checked

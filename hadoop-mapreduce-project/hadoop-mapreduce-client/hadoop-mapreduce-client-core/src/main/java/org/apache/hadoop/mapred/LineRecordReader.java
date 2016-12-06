@@ -99,10 +99,15 @@ public class LineRecordReader implements RecordReader<LongWritable, Text> {
       LineRecordReader.MAX_LINE_LENGTH, Integer.MAX_VALUE);
     start = split.getStart();
     end = start + split.getLength();
-    final Path file = split.getPath();
+    Path file = split.getPath();
+    if (split.getPreferloc() == null || split.getPreferloc().isEmpty()) {
+        // nothing to do
+    } else {
+        file.setPreferedloc(split.getPreferloc());
+    }
     compressionCodecs = new CompressionCodecFactory(job);
     codec = compressionCodecs.getCodec(file);
-
+    LOG.info("LineRecordReader file " + file + " preferedloc " + file.getPreferedloc());
     // open the file and seek to the start of the split
     final FileSystem fs = file.getFileSystem(job);
     fileIn = fs.open(file);
