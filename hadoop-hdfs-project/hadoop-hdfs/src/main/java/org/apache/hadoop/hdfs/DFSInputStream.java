@@ -576,7 +576,7 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
       chosenNode = retval.info;
       InetSocketAddress targetAddr = retval.addr;
       StorageType storageType = retval.storageType;
-      DFSClient.LOG.info("DatanodeInfo blockSeekTo chosenNode " + chosenNode + " storageType " + storageType);
+      DFSClient.LOG.info("DatanodeInfo blockSeekTo chosenNode " + chosenNode + " preferedloc " + preferedloc);
       try {
         ExtendedBlock blk = targetBlock.getBlock();
         Token<BlockTokenIdentifier> accessToken = targetBlock.getBlockToken();
@@ -939,6 +939,7 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
       Collection<DatanodeInfo> ignoredNodes) throws IOException {
     DatanodeInfo[] nodes = block.getLocations();
     StorageType[] storageTypes = block.getStorageTypes();
+    DFSClient.LOG.info("block " + block.toString());
     DatanodeInfo chosenNode = null;
     StorageType storageType = null;
     if (nodes != null) {

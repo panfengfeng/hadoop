@@ -107,7 +107,6 @@ public class LineRecordReader implements RecordReader<LongWritable, Text> {
     }
     compressionCodecs = new CompressionCodecFactory(job);
     codec = compressionCodecs.getCodec(file);
-    LOG.info("LineRecordReader file " + file + " preferedloc " + file.getPreferedloc());
     // open the file and seek to the start of the split
     final FileSystem fs = file.getFileSystem(job);
     fileIn = fs.open(file);

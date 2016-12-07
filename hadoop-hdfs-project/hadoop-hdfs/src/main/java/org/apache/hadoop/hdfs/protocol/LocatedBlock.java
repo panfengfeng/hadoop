@@ -125,7 +125,7 @@ public class LocatedBlock {
   public StorageType[] getStorageTypes() {
     return storageTypes;
   }
-  
+
   public String[] getStorageIDs() {
     return storageIDs;
   }
