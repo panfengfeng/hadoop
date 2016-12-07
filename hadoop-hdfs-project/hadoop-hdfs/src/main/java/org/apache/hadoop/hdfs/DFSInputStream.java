@@ -932,6 +932,7 @@ implements ByteBufferReadable, CanSetDropBehind, CanSetReadahead,
       Collection<DatanodeInfo> ignoredNodes) throws IOException {
     DatanodeInfo[] nodes = block.getLocations();
     StorageType[] storageTypes = block.getStorageTypes();
+    DFSClient.LOG.info("block " + block.toString());
     DatanodeInfo chosenNode = null;
     StorageType storageType = null;
     int once = 0;

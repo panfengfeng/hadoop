@@ -29,6 +29,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.hdfs.StorageType;
 import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor.BlockTargetPair;
@@ -374,8 +375,16 @@ public class DatanodeManager {
       while (lastActiveIndex > 0 && isInactive(di[lastActiveIndex])) {
           --lastActiveIndex;
       }
-      int activeLen = lastActiveIndex + 1;      
-      networktopology.sortByDistance(client, b.getLocations(), activeLen);
+      int activeLen = lastActiveIndex + 1;
+      StorageType[] copystoragetypes = b.getStorageTypes();
+      StorageType[] newstoragetypes = new StorageType[copystoragetypes.length];
+
+      int[] oldseq = networktopology.sortByDistanceandchangestoragetypes(client, b.getLocations(), activeLen);
+      // networktopology.sortByDistance(client, b.getLocations(), activeLen);
+      for (int i = 0; i < copystoragetypes.length; i++) {
+            newstoragetypes[i] = copystoragetypes[oldseq[i]];
+      }
+      b.setStorageTypes(newstoragetypes);
     }
   }
   

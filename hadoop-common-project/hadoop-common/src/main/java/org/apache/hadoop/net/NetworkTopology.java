@@ -17,13 +17,8 @@
  */
 package org.apache.hadoop.net;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -916,4 +911,40 @@ public class NetworkTopology {
     Preconditions.checkState(idx == activeLen,
         "Sorted the wrong number of nodes!");
   }
+
+    public int[] sortByDistanceandchangestoragetypes(Node reader, Node[] nodes, int activeLen) {
+        /** Sort weights for the nodes array */
+        int[] weights = new int[activeLen];
+        for (int i=0; i<activeLen; i++) {
+            weights[i] = getWeight(reader, nodes[i]);
+        }
+        // Add weight/node pairs to a TreeMap to sort
+        TreeMap<Integer, List<Map.Entry<Node, Integer>>> tree = new TreeMap<Integer, List<Map.Entry<Node, Integer>>>();
+        for (int i=0; i<activeLen; i++) {
+            int weight = weights[i];
+            Node node = nodes[i];
+            List<Map.Entry<Node, Integer>> list = tree.get(weight);
+            if (list == null) {
+                list = Lists.newArrayListWithExpectedSize(1);
+                tree.put(weight, list);
+            }
+            Map.Entry<Node, Integer> pair = new AbstractMap.SimpleEntry<Node, Integer>(node, i);
+            list.add(pair);
+        }
+        int[] oldseq = new int[activeLen];
+        int idx = 0;
+        for (List<Map.Entry<Node, Integer>> list: tree.values()) {
+            if (list != null) {
+                Collections.shuffle(list, r);
+                for (Map.Entry<Node, Integer> n: list) {
+                    nodes[idx] = n.getKey();
+                    oldseq[idx] = n.getValue();
+                    idx++;
+                }
+            }
+        }
+        Preconditions.checkState(idx == activeLen,
+                "Sorted the wrong number of nodes!");
+        return oldseq;
+    }
 }

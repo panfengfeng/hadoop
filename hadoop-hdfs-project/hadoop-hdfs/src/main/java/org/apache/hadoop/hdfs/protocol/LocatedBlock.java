@@ -45,7 +45,7 @@ public class LocatedBlock {
   /** Storage ID for each replica */
   private final String[] storageIDs;
   // Storage type for each replica, if reported.
-  private final StorageType[] storageTypes;
+  private StorageType[] storageTypes;
   // corrupt flag is true if all of the replicas of a block are corrupt.
   // else false. If block has few corrupt replicas, they are filtered and 
   // their locations are not part of this object
@@ -125,8 +125,12 @@ public class LocatedBlock {
   public StorageType[] getStorageTypes() {
     return storageTypes;
   }
-  
-  public String[] getStorageIDs() {
+
+  public void setStorageTypes(StorageType[] newstorageTypes) {
+      this.storageTypes = newstorageTypes;
+  }
+
+    public String[] getStorageIDs() {
     return storageIDs;
   }
 
